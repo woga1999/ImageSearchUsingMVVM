@@ -17,8 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class APIClient {
     public Retrofit retrofit = null;
     String TAG = "APIClient";
-    ArrayList<String> thumbnailArrayList;
-
+    ArrayList<Item> imageList;
     Boolean isEnd;
     int pageCount;
     int totalCount;
@@ -49,12 +48,14 @@ public class APIClient {
                 totalCount = metaObject.get("total_count").getAsInt();
                 Log.e(TAG, isEnd.toString());
 
-                thumbnailArrayList = new ArrayList<>();
+                imageList = new ArrayList<>();
                 for(int i=0; i<document.size(); i++){
                     JsonElement documentElement = document.get(i);
                     JsonObject docuObject = documentElement.getAsJsonObject();
                     String thumbnail_url = docuObject.get("thumbnail_url").getAsString();
-                    thumbnailArrayList.add(thumbnail_url);
+
+                    String doc_url = docuObject.get("doc_url").getAsString();
+                    imageList.add(new Item(thumbnail_url,doc_url));
                 }
             }
 
@@ -65,7 +66,7 @@ public class APIClient {
         });
     }
 
-    public ArrayList<String> getThumbnailArrayList(){
-        return this.thumbnailArrayList;
+    public ArrayList<Item> getImageArrayList(){
+        return imageList;
     }
 }

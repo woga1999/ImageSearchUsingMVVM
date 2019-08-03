@@ -2,11 +2,24 @@ package com.example.imagesearch;
 
 public class Item {
     String title;
-    String image;
+    String thumbnailURL;
+    String docURL;
 
-    public Item(String image, String title) {
+    public Item(String thumbnailURL, String docURL) {
         super();
+        this.thumbnailURL = thumbnailURL;
+        this.docURL = docURL;
+    }
+
+    public void setTitle(String title) {
         this.title = title;
-        this.image = image;
+    }
+
+    public void setThumbnailURL(String thumbnailURL) {
+        this.thumbnailURL = thumbnailURL;
+    }
+
+    public void setDocURL(String docURL) {
+        this.docURL = docURL;
     }
 }
