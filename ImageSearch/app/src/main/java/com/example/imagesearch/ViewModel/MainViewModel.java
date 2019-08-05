@@ -25,10 +25,10 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Item>> imageList;
     String TAG = "MainViewModel";
 
-    public LiveData<ArrayList<Item>> getData(String query){
+    public LiveData<ArrayList<Item>> getData(String query,int page){
 
         imageList = new MutableLiveData<>();
-        loadRestAPI(query);
+        loadRestAPI(query, page, 12);
         //원래 imagelist가 null이 아닐때는 new를 하지 않는데 재검색을 위해.
         return imageList;
     }
@@ -36,12 +36,12 @@ public class MainViewModel extends ViewModel {
         return MetaData.getInstance().getTotalCount();
     }
 
-    private void loadRestAPI(String query){
+    private void loadRestAPI(String query, int page, int size){
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(RestAPIService.Url)
                 .build();
         RestAPIService api = retrofit.create(RestAPIService.class);
-        Call<JsonObject> call = api.getResult(RestAPIService.API_KEY, query, RestAPIService.size);
+        Call<JsonObject> call = api.getResult(RestAPIService.API_KEY, query, page, size);
         Log.e(TAG, call.toString());
         call.enqueue(new Callback<JsonObject>() {
             @Override
@@ -50,15 +50,18 @@ public class MainViewModel extends ViewModel {
                 JsonObject result = response.body();
                 JsonArray document = (JsonArray) result.get("documents");
 
+                //meta 데이터 따로 저장
                 JsonObject metaObject = (JsonObject) result.get("meta");
                 boolean isEnd = metaObject.get("is_end").getAsBoolean();
                 int pageCount = metaObject.get("pageable_count").getAsInt();
                 int totalCount = metaObject.get("total_count").getAsInt();
                 MetaData.getInstance().setIsEnd(isEnd);
                 MetaData.getInstance().setTotalCount(totalCount);
+                MetaData.getInstance().setPageCount(pageCount);
 
                 ArrayList<Item> imageItem = new ArrayList<>();
 
+                //documents 데이터 추가
                 if(document != null){ //검색결과 0이 아닐 때
                     for(int i=0; i<document.size(); i++){
                         JsonElement documentElement = document.get(i);

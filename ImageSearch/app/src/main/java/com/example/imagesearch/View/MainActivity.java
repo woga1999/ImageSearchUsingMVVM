@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 
@@ -14,8 +15,9 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.imagesearch.Model.MetaData;
 import com.example.imagesearch.Model.Item;
+import com.example.imagesearch.Model.MetaData;
+import com.example.imagesearch.OnSwipeTouchListener;
 import com.example.imagesearch.R;
 import com.example.imagesearch.RecyclerAdapter;
 import com.example.imagesearch.ViewModel.MainViewModel;
@@ -29,10 +31,11 @@ public class MainActivity extends AppCompatActivity {
     String TAG = "MainActivity";
     RecyclerView recyclerView = null;
     RecyclerAdapter adapter = null;
-    ArrayList<Item> imageList;
     InputMethodManager mInputManager;
-    boolean first = false;
     SearchView searchView;
+    OnSwipeTouchListener onSwipeTouchListener;
+    String searchedQuery;
+    int pageCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setTitle("박효완");
         Log.e(TAG,"Create");
         mInputManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        pageCount = 1;
 
         initViews();
     }
@@ -57,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 //검색 버튼이 눌리면
                 setupAdapter(query);
-                Log.e(TAG, "검색 버튼 press");
+                searchedQuery = query;
                 return true;
             }
 
@@ -74,32 +78,59 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews(){
         recyclerView = findViewById(R.id.recyclerview);
-        LinearLayoutManager gridLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(gridLayoutManager);
+        LinearLayoutManager linerLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(linerLayoutManager);
+        onSwipeTouchListener = new OnSwipeTouchListener(getApplicationContext()) {
+            //아래에서 위로 스와이프 이벤트
+            public void onSwipeTop() {
+                if(searchedQuery != null){
+                    udateAdapter(searchedQuery, ++pageCount);
+                }
+            }
+            //위에서 아래로 스와이프 이벤트
+            public void onSwipeBottom() {
+                //키보드 내려가기
+                mInputManager.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+            }
+        };
+        //스와이프 터치 리스너 추가
+        recyclerView.setOnTouchListener(onSwipeTouchListener);
+    }
+
+    //스와이프 액션과 스크롤 액션 둘 다 가능하게 하기 위한 함수
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev){
+        onSwipeTouchListener.getGestureDetector().onTouchEvent(ev);
+        return super.dispatchTouchEvent(ev);
     }
 
     private void setupAdapter(String query){
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.getData(query).observe(this, new Observer<ArrayList<Item>>() {
+        viewModel.getData(query,1).observe(this, new Observer<ArrayList<Item>>() {
             @Override
             public void onChanged(ArrayList<Item> items) {
                 adapter = new RecyclerAdapter(getApplicationContext(), items);
                 recyclerView.setAdapter(adapter);
+                pageCount = 1;
+                //검색 결과가 없을 시 스낵바 이벤트
                 if(MetaData.getInstance().getTotalCount() == 0){
                     Snackbar.make(recyclerView, "검색결과가 없습니다.", Snackbar.LENGTH_LONG).show();
                 }
             }
         });
     }
-    private void udateAdapter(String query){
+
+    private void udateAdapter(String query, int page){
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.getData(query).observe(this, new Observer<ArrayList<Item>>() {
-            @Override
-            public void onChanged(ArrayList<Item> items) {
-                adapter.updateData(items);
-                Log.e(TAG, "업데이트");
-            }
-        });
+        if(page < MetaData.getInstance().getPageCount()) {
+            viewModel.getData(query, page).observe(this, new Observer<ArrayList<Item>>() {
+                @Override
+                public void onChanged(ArrayList<Item> items) {
+                    adapter.updateData(items);
+                    Log.e(TAG, "업데이트");
+                }
+            });
+        }
     }
 
 }

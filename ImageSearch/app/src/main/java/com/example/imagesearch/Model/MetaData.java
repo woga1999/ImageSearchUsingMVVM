@@ -2,8 +2,9 @@ package com.example.imagesearch.Model;
 
 public class MetaData {
     private static MetaData metaData;
-    public boolean is_end ;
-    public int totalCount;
+    boolean is_end ;
+    int totalCount;
+    int pageCount;
 
     public static MetaData getInstance(){
         if(metaData == null){
@@ -26,4 +27,6 @@ public class MetaData {
     public void setTotalCount(int totalCount){
         this.totalCount = totalCount;
     }
+    public void setPageCount(int pageCount){this.pageCount = pageCount; }
+    public int getPageCount(){return pageCount;}
 }
