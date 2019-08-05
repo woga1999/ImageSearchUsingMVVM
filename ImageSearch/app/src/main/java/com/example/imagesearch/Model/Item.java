@@ -1,33 +1,36 @@
 package com.example.imagesearch.Model;
 
 public class Item {
-    String title;
     String thumbnailURL;
     String docURL;
+    String imgURL;
     int width;
     int height;
+    String sitename;
+    String date;
 
-
-    public Item(String thumbnailURL, String docURL) {
+    public Item(String thumbnailURL, String docURL, String imgURL, int width, int height, String sitename, String date) {
         //super();
         this.thumbnailURL = thumbnailURL;
         this.docURL = docURL;
+        this.imgURL = imgURL;
+        this.width = width;
+        this.height = height;
+        this.sitename = sitename;
+        this.date =date;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public int getWidth() {
+        return width;
     }
 
-    public void setImageURL(String thumbnailURL) {
-        this.thumbnailURL = thumbnailURL;
+
+    public int getHeight() {
+        return height;
     }
 
-    public void setDocURL(String docURL) {
-        this.docURL = docURL;
-    }
-
-    public String getTitle() {
-        return title;
+    public String getImgURL() {
+        return imgURL;
     }
 
     public String getThumbnailURL() {
@@ -38,11 +41,11 @@ public class Item {
         return docURL;
     }
 
-    public int getWidth() {
-        return width;
+    public String getSitename() {
+        return sitename;
     }
 
-    public int getHeight() {
-        return height;
+    public String getDate() {
+        return date;
     }
 }

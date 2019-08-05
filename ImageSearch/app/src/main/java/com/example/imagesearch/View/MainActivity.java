@@ -11,13 +11,15 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.imagesearch.Model.MetaData;
 import com.example.imagesearch.Model.Item;
 import com.example.imagesearch.R;
 import com.example.imagesearch.RecyclerAdapter;
 import com.example.imagesearch.ViewModel.MainViewModel;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -38,7 +40,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("박효완");
+        Log.e(TAG,"Create");
         mInputManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
         initViews();
     }
     @Override
@@ -52,11 +56,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 // TODO Auto-generated method stub
                 //검색 버튼이 눌리면
-
                 setupAdapter(query);
-
                 Log.e(TAG, "검색 버튼 press");
-
                 return true;
             }
 
@@ -64,28 +65,16 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextChange(String newText) {
                 // TODO Auto-generated method stu
                 //검색창에 글자를 쓰면 여기로 옴
-                //Toast.makeText(getApplicationContext(), newText, Toast.LENGTH_SHORT).show();
-
                 return true;
             }
         });
 
         return true;
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        boolean menuSelectionHandeled = super.onOptionsItemSelected(item);
-        // menu_search is the id of the menu item in the ActionBar
-        if (item.getItemId() == R.id.app_bar_search) {
-            mInputManager.showSoftInput(null, InputMethodManager.SHOW_IMPLICIT);
-            Log.e(TAG, "서치 버튼 눌렸삼");
-        }
-        return menuSelectionHandeled;
-    }
 
     private void initViews(){
         recyclerView = findViewById(R.id.recyclerview);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(),3);
+        LinearLayoutManager gridLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(gridLayoutManager);
     }
 
@@ -95,9 +84,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(ArrayList<Item> items) {
                 adapter = new RecyclerAdapter(getApplicationContext(), items);
-                imageList = items;
                 recyclerView.setAdapter(adapter);
-                Log.e(TAG, "업데이트");
+                if(MetaData.getInstance().getTotalCount() == 0){
+                    Snackbar.make(recyclerView, "검색결과가 없습니다.", Snackbar.LENGTH_LONG).show();
+                }
             }
         });
     }
