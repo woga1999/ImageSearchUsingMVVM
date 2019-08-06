@@ -1,7 +1,7 @@
 # ImageSearch_Application
 
-###이미지 검색 어플리케이션
-##개발 언어: JAVA
+### 이미지 검색 어플리케이션
+## 개발 언어: JAVA
 
 * toolbar -> 이름 추가 및 서치 가능
 * Kakao REST API 사용
