@@ -35,15 +35,11 @@ public class RecyclerAdapter extends  RecyclerView.Adapter<RecyclerAdapter.ViewH
         this.context = context;
         this.imageItems = imageItems;
     }
-    //추가된 부분 notifyDataSet부분
+
+    //결과 더 보여주기 위한 함수
     public void updateData(ArrayList<Item> viewModels) {
-        Log.e(TAG, "어답터 업데함수");
         imageItems.addAll(viewModels);
         notifyDataSetChanged();
-    }
-
-    public void clearData(ArrayList<Item> items){
-        imageItems.clear();
     }
 
     @Override
@@ -56,7 +52,6 @@ public class RecyclerAdapter extends  RecyclerView.Adapter<RecyclerAdapter.ViewH
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Item item = imageItems.get(position);
-        //holder.thumbnail.setImageResource(R.drawable.app_icon);
         holder.onBind(item, position);
     }
 
@@ -97,35 +92,38 @@ public class RecyclerAdapter extends  RecyclerView.Adapter<RecyclerAdapter.ViewH
         void onBind(Item item, int position){
             this.item = item;
             this.position = position;
-
+            //이미지는 피카소 라이브러리 사용해서 set하고 텍스트는 setText 이용
+            //리스트 뷰
             Picasso.with(context).load(item.getThumbnailURL()).into(thumbnail);
-            String imageSIze = String.valueOf(item.getHeight())+" x " + String.valueOf(item.getWidth());
+            String imageSIze = String.valueOf(item.getWidth())+" x " + String.valueOf(item.getHeight());
             textImageSize.setText(imageSIze);
 
+            //expandable 리스트
             Picasso.with(context).load(item.getImgURL()).into(subImage);
             subTextDate.setText(item.getDate());
             subTextSiteName.setText(item.getSitename());
             subTextUrl.setText(item.getDocURL());
+
+            //onClick한 리스트뷰 확장시키거나 축소시키는 함수
             changeVisibility(selectedItems.get(position));
-            Log.e(TAG+"onBind", String.valueOf(position));
         }
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.linearItem:
                     if (selectedItems.get(position)) {
-                        // 펼쳐진 Item을 클릭 시
+                        Log.e(TAG, "확장");
+                        //리스템 아이템 축소
                         selectedItems.delete(position);
                     } else {
-                        // 직전의 클릭됐던 Item의 클릭상태를 지움
+                        //리스트 아이템 확장
+                        //전에 선택한 리스트 값 지우고 현재 리스트 값 넣기
                         selectedItems.delete(prePosition);
-                        // 클릭한 Item의 position을 저장
                         selectedItems.put(position, true);
                     }
-                    // 해당 포지션의 변화를 알림
+                    //해당 포지션의 변화 알림
                     if (prePosition != -1) notifyItemChanged(prePosition);
                     notifyItemChanged(position);
-                    // 클릭된 position 저장
                     prePosition = position;
                     break;
                 case R.id.subImageView:
@@ -137,18 +135,15 @@ public class RecyclerAdapter extends  RecyclerView.Adapter<RecyclerAdapter.ViewH
             }
         }
         private void changeVisibility(final boolean isExpanded) {
-            // height 값을 dp로 지정해서 넣고싶으면 아래 소스를 이용
             int dpValue = 150;
             float d = context.getResources().getDisplayMetrics().density;
             int height = (int) (dpValue * d);
 
-            // ValueAnimator.ofInt(int... values)는 View가 변할 값을 지정, 인자는 int 배열
             ValueAnimator va = isExpanded ? ValueAnimator.ofInt(0, height) : ValueAnimator.ofInt(height, 0);
             va.setDuration(300);
             va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
-                    // value는 height 값
                     int value = (int) animation.getAnimatedValue();
 
                     subImage.getLayoutParams().height = value;
@@ -161,17 +156,18 @@ public class RecyclerAdapter extends  RecyclerView.Adapter<RecyclerAdapter.ViewH
                     subTextUrl.setTextSize(10);
                     subTextUrl.setGravity(Gravity.CENTER);
 
-                    // imageView 확장축속
+                    //imageView 확장축소
                     subImage.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
                     //textview 확장축소
                     subTextDate.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
                     subTextSiteName.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
                     subTextUrl.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-
                 }
             });
             va.start();
         }
+
+        //확장된 아이템 subImageView, subTextUrl 클릭 시 웹뷰 열기
         public void intentPage(String url){
             Intent intent = new Intent(context, WebPageView.class);
             intent.putExtra("url",url);

@@ -22,6 +22,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainViewModel extends ViewModel {
+    //api 연결 및 view로 데이터 반환
     private MutableLiveData<ArrayList<Item>> imageList;
     String TAG = "MainViewModel";
 
@@ -31,9 +32,6 @@ public class MainViewModel extends ViewModel {
         loadRestAPI(query, page, 12);
         //원래 imagelist가 null이 아닐때는 new를 하지 않는데 재검색을 위해.
         return imageList;
-    }
-    public int totalCount(){
-        return MetaData.getInstance().getTotalCount();
     }
 
     private void loadRestAPI(String query, int page, int size){

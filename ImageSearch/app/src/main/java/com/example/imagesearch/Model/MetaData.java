@@ -1,6 +1,7 @@
 package com.example.imagesearch.Model;
 
 public class MetaData {
+    //meta에서 뽑아낸 데이터 관리 클래스
     private static MetaData metaData;
     boolean is_end ;
     int totalCount;
@@ -11,10 +12,6 @@ public class MetaData {
             metaData = new MetaData();
         }
         return metaData;
-    }
-
-    public boolean getIsEnd() {
-        return is_end;
     }
 
     public void setIsEnd(boolean is_end) {

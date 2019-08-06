@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.imagesearch.R;
 
 public class WebPageView extends AppCompatActivity {
+    //웹페이지보여주는 뷰
     private WebView mWebView;
 
     private String docUrl;
@@ -30,10 +31,11 @@ public class WebPageView extends AppCompatActivity {
         mWebView = findViewById(R.id.webView);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadUrl(docUrl);
-        mWebView.setWebChromeClient(new WebChromeClient());//웹뷰에 크롬 사용 허용
-        mWebView.setWebViewClient(new WebViewClientClass());//새창열기 없이 웹뷰 내에서 다시 열기
+        mWebView.setWebChromeClient(new WebChromeClient());
+        mWebView.setWebViewClient(new WebViewClientClass());
 
     }
+    //새창열기 없이 웹뷰 내에서 다시 열기
     private class WebViewClientClass extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
